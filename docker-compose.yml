@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  app:
+    image: node:14
+    container_name: "simple-tree"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sleep 300000

@@ -1,0 +1,22 @@
+{
+  "name": "simple-tree",
+  "version": "0.0.1",
+  "description": "Simple Versatile Tree",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tetz-akaneya/simple-tree.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tetz-akaneya/simple-tree/issues"
+  },
+  "homepage": "https://github.com/tetz-akaneya/simple-tree#readme",
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  }
+}
