@@ -1,13 +1,18 @@
-import { getLastName, incrementalKeys, isRoot, join, keys } from "./path"
+import { getLastName, incrementalKeys, isRoot, join, keys, toRelative } from "./path"
 
 export const genTree = <SimpleNode>(arg: {
   nodes: SimpleNode[]
+  isRoot: (node: SimpleNode) => boolean
   getPathFromNode: (node: SimpleNode) => string
 }) => {
-  const result = {}
-  arg.nodes.forEach(node => {
-    setDirectChildByKey(result, arg.getPathFromNode(node), node)
-  })
+  const root = arg.nodes.find(n => arg.isRoot(n))
+  arg.nodes
+    .filter(n => !arg.isRoot(n))
+    .forEach(node => {
+      setChildByRelativePath(root, toRelative('/', arg.getPathFromNode(node)), node)
+    })
+
+  return root
 }
 
 export const splitPath = (path: string) => {
@@ -46,6 +51,7 @@ export const setChildByRelativePath = (parent: any, path: string, value: any) =>
       if (idx !== increasingKeys.length - 1) {
         return {
           path: join([...keys(parent.path), ...keys(incrementalKey)]),
+          parent: acc,
           children: [],
         }
       } else {

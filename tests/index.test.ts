@@ -1,5 +1,5 @@
-import { parse, stringify } from 'flatted';
 import { genTree, getDirectChildByKey, setChildByRelativePath, setDirectChildByKey, splitPath } from "../src/index"
+import { toRelative } from '../src/path';
 
 const input = () => [
   {
@@ -24,7 +24,7 @@ const input = () => [
   },
 ]
 
-const connChildren = (parent: any, children: any[]) => {
+const pair = (parent: any, children: any[]) => {
   parent.children = children
   children.forEach(child => {
     child.parent = parent
@@ -40,13 +40,25 @@ const output = () => {
     foo2,
     foo1foo2,
   ] = data
-  return connChildren(root, [
-    connChildren(foo1, [
-      connChildren(foo1foo2, []),
+  return pair(root, [
+    pair(foo1, [
+      pair(foo1foo2, []),
     ]),
-    connChildren(foo2, []),
+    pair(foo2, []),
   ])
 }
+
+describe('genTree', () => {
+  test('genTree', () => {
+    const nodes = input()
+    const rootNode = genTree({
+      nodes,
+      getPathFromNode: (node) => node.path,
+      isRoot: node => node.path === '/',
+    })
+    expect(rootNode).toStrictEqual(output())
+  })
+})
 
 describe('splitPath', () => {
   it('splitPath', () => {
@@ -65,7 +77,7 @@ describe('getDirectChildByKey', () => {
       const hoge1 = {
         path: '/hoge1'
       }
-      const input = connChildren(root, [connChildren(hoge1, [])])
+      const input = pair(root, [pair(hoge1, [])])
       expect(getDirectChildByKey(
         input,
         'hoge1'
@@ -81,7 +93,7 @@ describe('getDirectChildByKey', () => {
       const hoge2 = {
         path: '/hoge1/hoge2'
       }
-      const input = connChildren(hoge1, [connChildren(hoge2, [])])
+      const input = pair(hoge1, [pair(hoge2, [])])
       expect(getDirectChildByKey(
         input,
         'hoge2'
@@ -95,7 +107,7 @@ describe('getDirectChildByKey', () => {
       const hoge2 = {
         path: '/hoge1/hoge2'
       }
-      const input = connChildren(hoge1, [connChildren(hoge2, [])])
+      const input = pair(hoge1, [pair(hoge2, [])])
       expect(getDirectChildByKey(
         input,
         'hoge1'
@@ -116,14 +128,14 @@ describe('setDirectChildByKey', () => {
 describe('setChildByRelativePath', () => {
   it('on root 1 step', () => {
     const data = output()
-    const value = { children: [] }
+    const value = {}
     setChildByRelativePath(data, 'hoge3', value)
     expect(getDirectChildByKey(data, 'hoge3')).toBe(value)
   })
 
   it('on root 2 steps', () => {
     const data = output()
-    const value = { children: [] }
+    const value = {}
     setChildByRelativePath(data, 'hoge3/hoge4', value)
     expect(
       getDirectChildByKey(
@@ -134,7 +146,7 @@ describe('setChildByRelativePath', () => {
 
   it('on non root 2 steps', () => {
     const data = output()
-    const value = { children: [] }
+    const value = {}
     setChildByRelativePath(getDirectChildByKey(data, 'foo1'), 'hoge3/hoge4', value)
     expect(
       getDirectChildByKey(
@@ -144,5 +156,13 @@ describe('setChildByRelativePath', () => {
         ),
         'hoge4'
       )).toBe(value)
+  })
+})
+
+describe('toRelative', () => {
+  test('toRelative', () => {
+    expect(toRelative('/', '/hoge')).toBe('hoge')
+    expect(toRelative('/', '/hoge1/hoge2')).toBe('hoge1/hoge2')
+    expect(toRelative('/hoge', '/hoge/hoge1/hoge2')).toBe('hoge1/hoge2')
   })
 })

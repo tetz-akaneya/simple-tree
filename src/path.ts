@@ -1,7 +1,7 @@
 const isRoot = (path: string) => path === '/'
 const isAbsolute = (path: string) => !path.startsWith('/')
 const isRelative = (path: string) => !isAbsolute(path)
-const keys = (path: string) => path.split('/')
+const keys = (path: string) => path === '/' ? [''] : path.split('/')
 const join = (keys: string[]) => trimDpl(keys.join('/'))
 const trimDpl = (path: string) => path.replace(/\/+/g, '/')
 const incrementalKeys = (path: string) => keys(path).map((_, idx, arr) => join(arr.slice(0, idx + 1)))
@@ -19,6 +19,9 @@ const validate = (path: string): boolean => {
   if (keys.length === 0) return false
   return keys.slice(1).every(key => key !== '')
 }
+const toRelative = (absPathBase: string, absPathTarget: string) => {
+  return join(keys(absPathTarget).slice(keys(absPathBase).length))
+}
 
 export {
   isRoot,
@@ -32,4 +35,5 @@ export {
   isCurrentPath,
   trimLast,
   validate,
+  toRelative,
 }
