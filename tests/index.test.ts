@@ -158,11 +158,3 @@ describe('setChildByRelativePath', () => {
       )).toBe(value)
   })
 })
-
-describe('toRelative', () => {
-  test('toRelative', () => {
-    expect(toRelative('/', '/hoge')).toBe('hoge')
-    expect(toRelative('/', '/hoge1/hoge2')).toBe('hoge1/hoge2')
-    expect(toRelative('/hoge', '/hoge/hoge1/hoge2')).toBe('hoge1/hoge2')
-  })
-})

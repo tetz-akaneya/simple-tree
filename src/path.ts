@@ -2,7 +2,13 @@ const isRoot = (path: string) => path === '/'
 const isAbsolute = (path: string) => !path.startsWith('/')
 const isRelative = (path: string) => !isAbsolute(path)
 const keys = (path: string) => path === '/' ? [''] : path.split('/')
-const join = (keys: string[]) => trimDpl(keys.join('/'))
+const join = (keys: string[]) => {
+  if (keys.length === 0) return ''
+  const first = keys[0] === '' ? [''] : []
+  const rmEmpty = keys.filter(key => key !== '')
+  if (rmEmpty.length === 0) return '/'
+  return [first, rmEmpty].flat().join('/')
+}
 const trimDpl = (path: string) => path.replace(/\/+/g, '/')
 const incrementalKeys = (path: string) => keys(path).map((_, idx, arr) => join(arr.slice(0, idx + 1)))
 const getLastName = (path: string) => {

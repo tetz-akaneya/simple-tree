@@ -4,8 +4,8 @@
   "description": "Simple Versatile Tree",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "test-brk": "node --max_old_space_size=4096 --inspect-brk=0.0.0.0 $(npm bin)/jest"
+    "test": "node --max_old_space_size=4096 --trace-warnings --inspect=0.0.0.0 $(npm bin)/jest",
+    "test-brk": "node --max_old_space_size=4096 --trace-warnings --inspect-brk=0.0.0.0 $(npm bin)/jest"
   },
   "repository": {
     "type": "git",
