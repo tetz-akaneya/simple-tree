@@ -1,4 +1,4 @@
-import { getLastName, incrementalKeys, isRoot, join, keys, toRelative } from "./path"
+import { filename, incrementalKeys, isRoot, join, keys, toRelative } from "./path"
 
 export const genTree = <SimpleNode>(arg: {
   nodes: SimpleNode[]
@@ -58,7 +58,7 @@ export const setChildByRelativePath = (parent: any, path: string, value: any) =>
         return value
       }
     })()
-    setDirectChildByKey(acc, getLastName(incrementalKey), nextChild)
+    setDirectChildByKey(acc, filename(incrementalKey), nextChild)
     return nextChild
   }, parent)
 }

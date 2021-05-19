@@ -11,11 +11,16 @@ const join = (keys: string[]) => {
 }
 const trimDpl = (path: string) => path.replace(/\/+/g, '/')
 const incrementalKeys = (path: string) => keys(path).map((_, idx, arr) => join(arr.slice(0, idx + 1)))
-const getLastName = (path: string) => {
+const filename = (path: string) => {
   if (path === '/') return '/'
   const keyList = keys(path)
   if (keyList.length === 0) return ''
   return keyList[keyList.length - 1]
+}
+const basename = (path: string) => {
+  const keyList = keys(path).slice()
+  const index = keyList.length - 1 > 0 ? keyList.length - 1 : 1
+  return join(keyList.slice(0, index))
 }
 const isParentPath = (path: string) => path === '..'
 const isCurrentPath = (path: string) => path === '.'
@@ -36,7 +41,8 @@ export {
   keys,
   join,
   incrementalKeys,
-  getLastName,
+  filename,
+  basename,
   isParentPath,
   isCurrentPath,
   trimLast,

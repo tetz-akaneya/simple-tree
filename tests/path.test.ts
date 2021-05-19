@@ -1,4 +1,4 @@
-import { join, keys, toRelative } from '../src/path';
+import { basename, join, keys, toRelative } from '../src/path';
 
 describe('toRelative', () => {
   test('toRelative', () => {
@@ -14,5 +14,20 @@ describe('keys and join', () => {
     expect(join(keys('/hoge'))).toBe('/hoge')
     expect(join(keys('/hoge/foo'))).toBe('/hoge/foo')
     expect(join(keys('hoge'))).toBe('hoge')
+  })
+
+  test('multiple keys and join', () => {
+    expect(join([keys('/'), keys('bar')].flat())).toBe('/bar')
+    expect(join([keys('/hoge'), keys('bar')].flat())).toBe('/hoge/bar')
+    expect(join([keys('/hoge/foo'), keys('bar')].flat())).toBe('/hoge/foo/bar')
+    expect(join([keys('hoge'), keys('bar')].flat())).toBe('hoge/bar')
+  })
+})
+
+describe('basename', () => {
+  test('basename', () => {
+    expect(basename('/hoge/foo')).toBe('/hoge')
+    expect(basename('/hoge')).toBe('/')
+    expect(basename('/')).toBe('/')
   })
 })
