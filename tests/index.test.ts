@@ -1,5 +1,4 @@
 import { genTree, getDirectChildByKey, setChildByRelativePath, setDirectChildByKey, splitPath } from "../src/index"
-import { toRelative } from '../src/path';
 
 const input = () => [
   {
