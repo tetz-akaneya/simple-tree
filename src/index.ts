@@ -1,4 +1,4 @@
-import { incrementalKeys, isRoot, keys } from "./path"
+import { getLastName, incrementalKeys, isRoot, join, keys } from "./path"
 
 export const genTree = <SimpleNode>(arg: {
   nodes: SimpleNode[]
@@ -38,11 +38,23 @@ export const setDirectChildByKey = (parent: any, key: string, value: any) => {
 
 export const setChildByRelativePath = (parent: any, path: string, value: any) => {
   if (isRoot(path)) return
-  incrementalKeys(path).reduce((acc, incrementalKey) => {
-    const item = getDirectChildByKey(acc, key)
+  const increasingKeys = incrementalKeys(path)
+  increasingKeys.reduce((acc, incrementalKey, idx) => {
+    const item = getDirectChildByKey(acc, incrementalKey)
     if (item) return item
-    setDirectChildByKey(acc, key, {
-      path: path
-    })
+    const nextChild = (() => {
+      if (idx !== increasingKeys.length - 1) {
+        return {
+          path: join([...keys(parent.path), ...keys(incrementalKey)]),
+          children: [],
+        }
+      } else {
+        value.path = join([...keys(parent.path), ...keys(incrementalKey)])
+        value.parent = acc
+        return value
+      }
+    })()
+    setDirectChildByKey(acc, getLastName(incrementalKey), nextChild)
+    return nextChild
   }, parent)
 }

@@ -1,5 +1,5 @@
 import { parse, stringify } from 'flatted';
-import { genTree, getDirectChildByKey, setDirectChildByKey, splitPath } from "../src/index"
+import { genTree, getDirectChildByKey, setChildByRelativePath, setDirectChildByKey, splitPath } from "../src/index"
 
 const input = () => [
   {
@@ -110,5 +110,39 @@ describe('setDirectChildByKey', () => {
     const value = { path: '/hoge3', children: [] }
     setDirectChildByKey(data, 'hoge3', value)
     expect(getDirectChildByKey(data, 'hoge3')).toBe(value)
+  })
+})
+
+describe('setChildByRelativePath', () => {
+  it('on root 1 step', () => {
+    const data = output()
+    const value = { children: [] }
+    setChildByRelativePath(data, 'hoge3', value)
+    expect(getDirectChildByKey(data, 'hoge3')).toBe(value)
+  })
+
+  it('on root 2 steps', () => {
+    const data = output()
+    const value = { children: [] }
+    setChildByRelativePath(data, 'hoge3/hoge4', value)
+    expect(
+      getDirectChildByKey(
+        getDirectChildByKey(data, 'hoge3'),
+        'hoge4'
+      )).toBe(value)
+  })
+
+  it('on non root 2 steps', () => {
+    const data = output()
+    const value = { children: [] }
+    setChildByRelativePath(getDirectChildByKey(data, 'foo1'), 'hoge3/hoge4', value)
+    expect(
+      getDirectChildByKey(
+        getDirectChildByKey(
+          getDirectChildByKey(data, 'foo1'),
+          'hoge3'
+        ),
+        'hoge4'
+      )).toBe(value)
   })
 })

@@ -9,3 +9,7 @@ services:
     ports:
       - 52000:9229
     command: sleep 300000
+    environment: 
+      NODE_OPTIONS: --max_old_space_size=4096
+volumes:
+  node_modules:
