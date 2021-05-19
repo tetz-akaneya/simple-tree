@@ -25,9 +25,9 @@ const input = () => [
 
 const pair = (parent: any, children: any[]) => {
   parent.children = children
-  children.forEach(child => {
-    child.parent = parent
-  })
+  // children.forEach(child => {
+  //   child.parent = parent
+  // })
   return parent
 }
 

@@ -51,12 +51,10 @@ export const setChildByRelativePath = (parent: any, path: string, value: any) =>
       if (idx !== increasingKeys.length - 1) {
         return {
           path: join([...keys(parent.path), ...keys(incrementalKey)]),
-          parent: acc,
           children: [],
         }
       } else {
         value.path = join([...keys(parent.path), ...keys(incrementalKey)])
-        value.parent = acc
         return value
       }
     })()
