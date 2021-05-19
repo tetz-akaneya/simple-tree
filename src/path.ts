@@ -1,5 +1,5 @@
 const isRoot = (path: string) => path === '/'
-const isAbsolute = (path: string) => !path.startsWith('/')
+const isAbsolute = (path: string) => path.startsWith('/')
 const isRelative = (path: string) => !isAbsolute(path)
 const keys = (path: string) => path === '/' ? [''] : path.split('/')
 const join = (keys: string[]) => {
@@ -10,14 +10,22 @@ const join = (keys: string[]) => {
   return [first, rmEmpty].flat().join('/')
 }
 const trimDpl = (path: string) => path.replace(/\/+/g, '/')
-const incrementalKeys = (path: string) => keys(path).map((_, idx, arr) => join(arr.slice(0, idx + 1)))
-const filename = (path: string) => {
+const incrementalKeys = (pathArg: string) => {
+  const path = pathArg.trim()
+  if (path === '') return []
+  return keys(path).map((_, idx, arr) => join(arr.slice(0, idx + 1)))
+}
+const filename = (pathArg: string) => {
+  const path = pathArg.trim()
+  if (path === '') return ''
   if (path === '/') return '/'
   const keyList = keys(path)
   if (keyList.length === 0) return ''
   return keyList[keyList.length - 1]
 }
-const basename = (path: string) => {
+const basename = (pathArg: string) => {
+  const path = pathArg.trim()
+  if (path === '') return ''
   const keyList = keys(path).slice()
   const index = keyList.length - 1 > 0 ? keyList.length - 1 : 1
   return join(keyList.slice(0, index))

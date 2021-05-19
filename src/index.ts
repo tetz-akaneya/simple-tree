@@ -1,4 +1,4 @@
-import { filename, incrementalKeys, isRoot, join, keys, toRelative } from "./path"
+import { filename, incrementalKeys, isAbsolute, isRelative, isRoot, join, keys, toRelative } from "./path"
 
 export const genTree = <SimpleNode>(arg: {
   nodes: SimpleNode[]
@@ -9,7 +9,11 @@ export const genTree = <SimpleNode>(arg: {
   arg.nodes
     .filter(n => !arg.isRoot(n))
     .forEach(node => {
-      setChildByRelativePath(root, toRelative('/', arg.getPathFromNode(node)), node)
+      setNodeByPath({
+        parent: root,
+        path: toRelative('/', arg.getPathFromNode(node)),
+        value: node,
+      })
     })
 
   return root
@@ -41,8 +45,7 @@ export const setDirectChildByKey = (parent: any, key: string, value: any) => {
   }
 }
 
-export const setChildByRelativePath = (parent: any, path: string, value: any) => {
-  if (isRoot(path)) return
+export const getNodeByPath = (parent: any, path: string, value: any) => {
   const increasingKeys = incrementalKeys(path)
   increasingKeys.reduce((acc, incrementalKey, idx) => {
     const item = getDirectChildByKey(acc, incrementalKey)
@@ -61,4 +64,38 @@ export const setChildByRelativePath = (parent: any, path: string, value: any) =>
     setDirectChildByKey(acc, filename(incrementalKey), nextChild)
     return nextChild
   }, parent)
+}
+
+export const setNodeByPath = (arg: {
+  parent: any
+  path: string
+  value: any
+}) => {
+  const path = ((path: string) => {
+    if (isAbsolute(path)) {
+      if (!isRoot(arg.parent)) {
+        console.log('unable to set without supplying root node at absolute path')
+      }
+      return toRelative('/', path)
+    }
+    return path
+  })(arg.path)
+  const increasingKeys = incrementalKeys(path)
+  increasingKeys.reduce((acc, incrementalKey, idx) => {
+    const item = getDirectChildByKey(acc, incrementalKey)
+    if (item) return item
+    const nextChild = (() => {
+      if (idx !== increasingKeys.length - 1) {
+        return {
+          path: join([...keys(arg.parent.path), ...keys(incrementalKey)]),
+          children: [],
+        }
+      } else {
+        arg.value.path = join([...keys(arg.parent.path), ...keys(incrementalKey)])
+        return arg.value
+      }
+    })()
+    setDirectChildByKey(acc, filename(incrementalKey), nextChild)
+    return nextChild
+  }, arg.parent)
 }

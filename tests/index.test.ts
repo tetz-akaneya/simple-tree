@@ -1,4 +1,4 @@
-import { genTree, getDirectChildByKey, setChildByRelativePath, setDirectChildByKey, splitPath } from "../src/index"
+import { genTree, getDirectChildByKey, setNodeByPath, setDirectChildByKey, splitPath } from "../src/index"
 
 const input = () => [
   {
@@ -25,9 +25,6 @@ const input = () => [
 
 const pair = (parent: any, children: any[]) => {
   parent.children = children
-  // children.forEach(child => {
-  //   child.parent = parent
-  // })
   return parent
 }
 
@@ -128,31 +125,25 @@ describe('setChildByRelativePath', () => {
   it('on root 1 step', () => {
     const data = output()
     const value = {}
-    setChildByRelativePath(data, 'hoge3', value)
+    setNodeByPath({
+      parent: data,
+      path: '/hoge3',
+      value,
+    })
     expect(getDirectChildByKey(data, 'hoge3')).toBe(value)
   })
 
   it('on root 2 steps', () => {
     const data = output()
     const value = {}
-    setChildByRelativePath(data, 'hoge3/hoge4', value)
+    setNodeByPath({
+      parent: data,
+      path: '/hoge3/hoge4',
+      value,
+    })
     expect(
       getDirectChildByKey(
         getDirectChildByKey(data, 'hoge3'),
-        'hoge4'
-      )).toBe(value)
-  })
-
-  it('on non root 2 steps', () => {
-    const data = output()
-    const value = {}
-    setChildByRelativePath(getDirectChildByKey(data, 'foo1'), 'hoge3/hoge4', value)
-    expect(
-      getDirectChildByKey(
-        getDirectChildByKey(
-          getDirectChildByKey(data, 'foo1'),
-          'hoge3'
-        ),
         'hoge4'
       )).toBe(value)
   })
