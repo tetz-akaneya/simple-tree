@@ -15,7 +15,8 @@ const alphabetEdges: [string, string][] = [
   ['f', 'g'],
   ['g', 'h'],
   ['i', 'c'],
-  ['j', 'e']
+  ['j', 'e'],
+  ['e', 'a'],
 ]
 
 const numberNodes = (() => {
@@ -38,7 +39,10 @@ const edges = alphabetEdges
 
 describe('dag', () => {
   test('dag', () => {
-    Rx.of(toposort(edges))
+    Rx.of(toposort({
+      nodes,
+      getChildren: node => edges.filter(([from, _]) => from === node).map(([_, to]) => to)
+    }))
       .subscribe(result =>
         expect(edges.every(([from, to]) => result.indexOf(from) < result.indexOf(to))).toBe(true)
       )

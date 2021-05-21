@@ -6,55 +6,63 @@
  * @returns {Array}
  */
 
-const toposort: <T = string>(
+const toposort: <T = string>(arg: {
   nodes: T[],
-  edges: [T, T][],
-) => T[] = (nodes, edges) => {
-  type T = typeof nodes[0]
+  getChildren: (node: T) => T[]
+}) => T[] = ({ nodes, getChildren }) => {
+  type T = ReturnType<typeof getChildren>[number]
   let cursor = nodes.length
-  let currentNodeId = cursor
   const sorted = new Array(cursor)
-  const visited: { [index: number]: boolean } = {}
+  const visited = sorted.map(() => false)
+  const edges: [T, T][] = nodes
+    .flatMap(node =>
+      getChildren(node).map(child => [node, child] as [T, T])
+    )
   const outgoingEdges = makeOutgoingEdges(edges)
   const nodesHash = makeNodesHash(nodes)
 
   // check for unknown nodes
-  edges.forEach(function (edge) {
-    if (!nodesHash.has(edge[0]) || !nodesHash.has(edge[1])) {
+  edges.forEach(function ([from, to]) {
+    if (!nodesHash.has(from) || !nodesHash.has(to)) {
       throw new Error('Unknown node. There is an unknown node in the supplied edges.')
     }
   })
 
   const visit = (node: T, idx: number, predecessors: Set<T>) => {
     if (predecessors.has(node)) {
-      throw new Error('Cyclic dependency' + tryStringify(node))
+      const result: string[] = []
+      predecessors.forEach(node => {
+        result.push(tryStringify(node))
+      })
+      result.push(tryStringify(node))
+      throw new Error('Cyclic dependency: ' + result.join('\n -> '))
     }
 
     if (!nodesHash.has(node)) {
       throw new Error('Found unknown node. Make sure to provided all involved nodes. Unknown node: ' + JSON.stringify(node))
     }
 
-    if (visited[idx]) return;
+    if (visited[idx]) return
     visited[idx] = true
 
     const outgoingSet = outgoingEdges.get(node) || new Set<T>()
     const outgoingArr = Array.from(outgoingSet)
 
-    if (idx = outgoingArr.length) {
+    if (outgoingArr.length) {
       predecessors.add(node)
-      do {
-        var child = outgoingArr[--idx]
+      getChildren(node).forEach(child => {
         visit(child, nodesHash.get(child)!, predecessors)
-      } while (idx)
+      })
       predecessors.delete(node)
     }
 
     sorted[--cursor] = node
   }
 
-  while (currentNodeId--) {
-    if (!visited[currentNodeId]) visit(nodes[currentNodeId], currentNodeId, new Set())
-  }
+  nodes.forEach((node) => {
+    const currentNodeId = nodesHash.get(node)!
+    if (!visited[currentNodeId]) visit(node, currentNodeId, new Set())
+  })
 
   return sorted
 }
@@ -82,13 +90,9 @@ const makeOutgoingEdges = <T>(edgeList: [T, T][]): Map<T, Set<T>> => {
 }
 
 const makeNodesHash = <T>(arr: T[]): Map<T, number> => {
-  const res = new Map()
+  const res = new Map<T, number>()
   arr.forEach((node, idx) => res.set(node, idx))
   return res
-}
-
-const defaultExport: <T = string>(edges: [T, T][]) => T[] = edges => {
-  return toposort(uniqueNodes(edges), edges)
 }
 
 const tryStringify = (obj: any) => {
@@ -99,4 +103,4 @@ const tryStringify = (obj: any) => {
   }
 }
 
-export default defaultExport
+export default toposort
