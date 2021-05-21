@@ -1,10 +1,9 @@
-import toposort from '../src/dig'
+import toposort from '../src/dag'
+import * as Rx from 'rxjs'
 
-// const edges: [string, string][] = [
-//   ['1', '2'],
-//   ['3', '1'],
-// ]
-const edges: [string, string][] = [
+const bigNum = 10 ** 6
+const alphabetNodes = 'abcdefghij'.split('')
+const alphabetEdges: [string, string][] = [
   ['a', 'b'],
   ['a', 'c'],
   ['b', 'd'],
@@ -16,22 +15,32 @@ const edges: [string, string][] = [
   ['f', 'g'],
   ['g', 'h'],
   ['i', 'c'],
-  ['j', 'e'],
-];
+  ['j', 'e']
+]
 
-describe.only('dag', () => {
+const numberNodes = (() => {
+  const array: number[] = []
+  for (let index = 0; index < bigNum; index++) {
+    array.push(index)
+  }
+  return array
+})()
+
+const numberEdges: [number, number][] = numberNodes.flatMap((_, idx) => {
+  const isLarger = idx > bigNum - 3
+  if (!isLarger)
+    return [[idx, idx + 1], [idx, idx + 2], [idx, idx + 3]]
+  return []
+})
+
+const nodes = alphabetNodes
+const edges = alphabetEdges
+
+describe('dag', () => {
   test('dag', () => {
-    expect(toposort(edges)).toStrictEqual([
-      'a',
-      'i',
-      'j',
-      'b',
-      'c',
-      'e',
-      'd',
-      'f',
-      'g',
-      'h'
-    ])
+    Rx.of(toposort(edges))
+      .subscribe(result =>
+        expect(edges.every(([from, to]) => result.indexOf(from) < result.indexOf(to))).toBe(true)
+      )
   })
 })
