@@ -9,7 +9,10 @@
 const toposort: <T = string>(arg: {
   nodes: T[],
   getChildren: (node: T) => T[]
-}) => T[] = ({ nodes, getChildren }) => {
+}) => T[] = (arg) => {
+  const nodes = uniqueNodes(arg.nodes)
+  const { getChildren } = arg
+
   type T = ReturnType<typeof getChildren>[number]
   let cursor = nodes.length
   const sorted = new Array(cursor)
@@ -67,13 +70,11 @@ const toposort: <T = string>(arg: {
   return sorted
 }
 
-const uniqueNodes = <T>(arr: [T, T][]): T[] => {
-  var res = new Set<T>()
-  for (var i = 0, len = arr.length; i < len; i++) {
-    var edge = arr[i]
-    res.add(edge[0])
-    res.add(edge[1])
-  }
+const uniqueNodes = <T>(nodes: T[]): T[] => {
+  const res = new Set<T>()
+  nodes.forEach(node => {
+    res.add(node)
+  })
 
   return Array.from(res)
 }
